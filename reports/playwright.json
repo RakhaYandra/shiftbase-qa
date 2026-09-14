@@ -1,12 +1,12 @@
 {
   "config": {
     "argv": [
-      "/home/rakha/.local/share/mise/installs/node/26.8.1/bin/node",
-      "/home/rakha/Work/shiftbase-qa/e2e/node_modules/.bin/playwright",
+      "~/.local/share/mise/installs/node/26.8.1/bin/node",
+      "~/Work/shiftbase-qa/e2e/node_modules/.bin/playwright",
       "test"
     ],
-    "configFile": "/home/rakha/Work/shiftbase-qa/e2e/playwright.config.ts",
-    "rootDir": "/home/rakha/Work/shiftbase-qa/e2e/tests",
+    "configFile": "~/Work/shiftbase-qa/e2e/playwright.config.ts",
+    "rootDir": "~/Work/shiftbase-qa/e2e/tests",
     "failOnFlakyTests": false,
     "forbidOnly": false,
     "fullyParallel": false,
@@ -22,7 +22,7 @@
     "preserveOutput": "always",
     "projects": [
       {
-        "outputDir": "/home/rakha/Work/shiftbase-qa/e2e/test-results",
+        "outputDir": "~/Work/shiftbase-qa/e2e/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
@@ -30,7 +30,7 @@
         },
         "id": "",
         "name": "",
-        "testDir": "/home/rakha/Work/shiftbase-qa/e2e/tests",
+        "testDir": "~/Work/shiftbase-qa/e2e/tests",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -59,7 +59,7 @@
     "workers": 8,
     "webServer": {
       "command": "npm run dev -- --port 5198 --strictPort",
-      "cwd": "/home/rakha/Work/shiftbase-web",
+      "cwd": "~/Work/shiftbase-web",
       "url": "http://localhost:5198",
       "reuseExistingServer": true,
       "env": {
