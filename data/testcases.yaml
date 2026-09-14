@@ -1,0 +1,304 @@
+- id: TC-AUTH-01
+  module: Auth
+  title: Login 3 peran + /me benar
+  priority: High
+  type: functional
+  precond: DB seed
+  steps: ["Login admin/manager/staff", "GET /v1/me tiap token"]
+  expected: Role sesuai (admin, manager, staff)
+- id: TC-AUTH-02
+  module: Auth
+  title: Kredensial salah 401
+  priority: High
+  type: negative
+  precond: "-"
+  steps: ["POST login password salah"]
+  expected: 401 invalid_credentials
+- id: TC-AUTH-03
+  module: Auth
+  title: Register default staff + email ganda 409
+  priority: Medium
+  type: functional
+  precond: Token valid
+  steps: ["Register email acak", "Register ulang email sama"]
+  expected: 201 role staff, lalu 409 email_taken
+- id: TC-RBAC-01
+  module: RBAC
+  title: Staff tak bisa tulis employees
+  priority: High
+  type: negative
+  precond: Token staff
+  steps: ["POST /v1/employees sebagai staff"]
+  expected: 403 forbidden
+- id: TC-RBAC-02
+  module: RBAC
+  title: Manager baca tapi tak bisa tulis employees
+  priority: High
+  type: negative
+  precond: Token manager
+  steps: ["GET /v1/employees (boleh)", "POST /v1/employees"]
+  expected: 200 lalu 403
+- id: TC-RBAC-03
+  module: RBAC
+  title: Staff tak bisa reports
+  priority: High
+  type: negative
+  precond: Token staff
+  steps: ["GET /v1/reports/overtime", "GET /v1/reports/coverage"]
+  expected: 403 keduanya
+- id: TC-RBAC-04
+  module: RBAC
+  title: Manager boleh reports + import
+  priority: Medium
+  type: functional
+  precond: Token manager
+  steps: ["GET reports/overtime", "POST employees/import CSV valid"]
+  expected: 200 keduanya
+- id: TC-RBAC-05
+  module: RBAC
+  title: Attendance staff terkunci milik sendiri
+  priority: High
+  type: functional
+  precond: Token staff (ter-link employee)
+  steps: ["POST check-in tanpa employee_id", "GET /v1/attendance"]
+  expected: Check-in employee sendiri 201; list hanya milik sendiri
+- id: TC-RBAC-06
+  module: RBAC
+  title: Admin wajib employee_id untuk absensi
+  priority: Medium
+  type: negative
+  precond: Token admin
+  steps: ["POST check-in tanpa employee_id"]
+  expected: 400 employee_id wajib
+- id: TC-EMP-01
+  module: Employees
+  title: CRUD employee (admin)
+  priority: High
+  type: functional
+  precond: Token admin
+  steps: ["POST", "GET list memuat", "PUT ubah nama", "DELETE 204", "GET 404"]
+  expected: Siklus penuh sesuai status
+- id: TC-EMP-02
+  module: Employees
+  title: Email ganda 409
+  priority: Medium
+  type: negative
+  precond: Token admin
+  steps: ["POST email seed ayu.lestari@example.com"]
+  expected: 409 email_taken
+- id: TC-EMP-03
+  module: Employees
+  title: Email invalid / tanggal rusak 400
+  priority: Medium
+  type: boundary
+  precond: Token admin
+  steps: ["POST email 'bukan-email'", "POST hire_date 'besok'"]
+  expected: 400 keduanya
+- id: TC-SHIFT-01
+  module: Shifts
+  title: CRUD shift (manager)
+  priority: High
+  type: functional
+  precond: Token manager, employee seed
+  steps: ["POST shift 2030-02-01 08-16", "GET ?date=", "PUT", "DELETE"]
+  expected: Siklus penuh
+- id: TC-SHIFT-02
+  module: Shifts
+  title: Shift bentrok 409
+  priority: High
+  type: negative
+  precond: Shift 2030-02-01 08-16 ada
+  steps: ["POST 10-14 tanggal sama pegawai sama"]
+  expected: 409 shift_conflict
+- id: TC-SHIFT-03
+  module: Shifts
+  title: Beda pegawai boleh overlap
+  priority: Medium
+  type: functional
+  precond: 2 employee
+  steps: ["POST jam sama pegawai berbeda"]
+  expected: 201
+- id: TC-SHIFT-04
+  module: Shifts
+  title: Staff tak bisa tulis shift
+  priority: Medium
+  type: negative
+  precond: Token staff
+  steps: ["POST /v1/shifts"]
+  expected: 403
+- id: TC-SHIFT-05
+  module: Shifts
+  title: Jam selesai <= mulai ditolak
+  priority: Low
+  type: boundary
+  precond: Token manager
+  steps: ["POST 16:00-08:00"]
+  expected: 400
+- id: TC-ATT-01
+  module: Attendance
+  title: Check-in lalu check-out (admin untuk employee)
+  priority: High
+  type: functional
+  precond: Token admin, employee tanpa open hari ini
+  steps: ["POST check-in", "POST check-out"]
+  expected: 201 checked_in lalu 200 checked_out
+- id: TC-ATT-02
+  module: Attendance
+  title: Check-in ganda 409
+  priority: High
+  type: negative
+  precond: Sudah check-in (TC-ATT-01)
+  steps: ["POST check-in lagi employee sama"]
+  expected: 409 attendance_duplicate
+- id: TC-ATT-03
+  module: Attendance
+  title: Check-out tanpa check-in 404
+  priority: Medium
+  type: negative
+  precond: Employee lain tanpa open
+  steps: ["POST check-out"]
+  expected: 404 no_open_checkin
+- id: TC-ATT-04
+  module: Attendance
+  title: Riwayat filter tanggal
+  priority: Medium
+  type: functional
+  precond: Ada attendance
+  steps: ["GET ?from=&to= Januari 2030"]
+  expected: List berisi entri TC-ATT-01
+- id: TC-IMP-01
+  module: Import
+  title: CSV valid terimport
+  priority: High
+  type: functional
+  precond: Token manager
+  steps: ["POST CSV 2 baris valid"]
+  expected: imported 2, failed 0
+- id: TC-IMP-02
+  module: Import
+  title: Header salah ditolak
+  priority: Medium
+  type: negative
+  precond: Token manager
+  steps: ["POST CSV header (nama,email)"]
+  expected: 400 + pesan header harus
+- id: TC-IMP-03
+  module: Import
+  title: Baris rusak parsial (email + tanggal)
+  priority: Medium
+  type: functional
+  precond: Token manager
+  steps: ["POST CSV 1 valid + 1 email rusak + 1 tanggal rusak"]
+  expected: imported 1, failed 2 + row errors tepat
+- id: TC-IMP-04
+  module: Import
+  title: Email duplikat per baris
+  priority: Low
+  type: functional
+  precond: Token manager
+  steps: ["POST CSV email seed ganda"]
+  expected: failed 1 'email sudah ada'
+- id: TC-IMP-05
+  module: Import
+  title: Tanpa file / >2MB ditolak
+  priority: Low
+  type: boundary
+  precond: Token manager
+  steps: ["POST tanpa field file", "POST file 3MB"]
+  expected: 400 keduanya
+- id: TC-IMP-06
+  module: Import
+  title: Staff tak bisa import
+  priority: Medium
+  type: negative
+  precond: Token staff
+  steps: ["POST CSV valid"]
+  expected: 403
+- id: TC-REP-01
+  module: Reports
+  title: Overtime >8 jam/hari
+  priority: High
+  type: functional
+  precond: Token manager; shift+attendance 10 jam di tanggal uji
+  steps: ["GET overtime from/to mencakup tanggal uji"]
+  expected: overtime_hours = total - 8 untuk employee
+- id: TC-REP-02
+  module: Reports
+  title: Coverage headcount per tanggal
+  priority: Medium
+  type: functional
+  precond: Shift di tanggal uji
+  steps: ["GET coverage?date= tanggal uji"]
+  expected: headcount = jumlah shift tanggal itu
+- id: TC-WEB-01
+  module: Web
+  title: Login 3 peran + nav per peran
+  priority: High
+  type: functional
+  precond: Web :5198
+  steps: ["Login admin/manager/staff", "Lihat nav"]
+  expected: Admin 4 menu; staff tanpa Shift/Laporan
+- id: TC-WEB-02
+  module: Web
+  title: Papan roster tampil per tanggal
+  priority: High
+  type: functional
+  precond: Login manager, shift di tanggal uji
+  steps: ["Buka Jadwal, pilih tanggal uji"]
+  expected: Lane pegawai + blok jam tampil
+- id: TC-WEB-03
+  module: Web
+  title: Tambah shift via UI + konflik ramah
+  priority: High
+  type: functional
+  precond: Login manager
+  steps: ["Tambah shift bentrok via dialog"]
+  expected: Pesan tabrakan jelas (bukan error mentah)
+- id: TC-WEB-04
+  module: Web
+  title: Check-in/out via UI
+  priority: High
+  type: functional
+  precond: Login admin
+  steps: ["Absensi: check-in lalu check-out satu employee"]
+  expected: Status berubah, riwayat bertambah
+- id: TC-WEB-05
+  module: Web
+  title: Import CSV via UI
+  priority: Medium
+  type: functional
+  precond: Login manager
+  steps: ["Upload CSV 1 baris di halaman pegawai"]
+  expected: Notice sukses + nama muncul
+- id: TC-WEB-06
+  module: Web
+  title: Laporan overtime tampil
+  priority: Medium
+  type: functional
+  precond: Login manager
+  steps: ["Buka Laporan, pilih rentang uji"]
+  expected: Tabel overtime terisi
+- id: TC-API-01
+  module: API
+  title: Newman suite hijau
+  priority: High
+  type: automation
+  precond: API + MySQL fresh seed
+  steps: ["npx newman run api/postman_collection.json"]
+  expected: 100% assertions pass
+- id: TC-API-02
+  module: API
+  title: Swagger valid
+  priority: Medium
+  type: automation
+  precond: "-"
+  steps: ["swagger-cli validate api/swagger.yaml"]
+  expected: valid
+- id: TC-API-03
+  module: API
+  title: Unit test service gate
+  priority: Medium
+  type: automation
+  precond: Repo shiftbase
+  steps: ["go test ./... -cover"]
+  expected: Pass, service ≥ 60%

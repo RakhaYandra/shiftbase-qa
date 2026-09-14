@@ -1,0 +1,6 @@
+project: Shiftbase QA
+version: "1.0"
+date: "2026-09-14"
+environment: MySQL 8.4 docker :13306 (DB shiftbase_qa), API :18092, Web :5198, Chromium headless
+tester: Rakha
+accounts: admin/manager/staff @shiftbase.local

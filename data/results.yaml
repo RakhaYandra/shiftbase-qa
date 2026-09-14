@@ -1,0 +1,31 @@
+# run 2026-09-14T23:55:15
+TC-API-03: Pass  # go test (manual di bawah)
+TC-ATT-01: Pass  # out=200
+TC-ATT-02: Pass  # 201,409
+TC-ATT-03: Pass
+TC-ATT-04: Pass
+TC-AUTH-01: Pass
+TC-AUTH-02: Pass
+TC-AUTH-03: Pass
+TC-EMP-01: Pass
+TC-EMP-02: Pass
+TC-EMP-03: Pass
+TC-IMP-01: Pass  # {"errors":null,"failed":0,"imported":1}
+TC-IMP-02: Pass
+TC-IMP-03: Pass  # {"errors":[{"row":3,"error":"email tidak valid"},{"row":4,"error":"hire_date harus YYYY-MM-DD"}],"failed":2,"imported":1}
+TC-IMP-04: Pass
+TC-IMP-05: Pass
+TC-IMP-06: Pass
+TC-RBAC-01: Pass
+TC-RBAC-02: Pass
+TC-RBAC-03: Pass
+TC-RBAC-04: Pass
+TC-RBAC-05: Pass  # staff seed tak ter-link employee (by design)
+TC-RBAC-06: Pass
+TC-REP-01: Pass
+TC-REP-02: Pass
+TC-SHIFT-01: Pass
+TC-SHIFT-02: Pass
+TC-SHIFT-03: Pass
+TC-SHIFT-04: Pass
+TC-SHIFT-05: Pass
