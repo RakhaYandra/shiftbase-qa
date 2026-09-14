@@ -1,7 +1,8 @@
 - id: BUG-SB-001
   title: Dropdown pegawai tak refresh setelah import CSV
   severity: Low
-  status: Open
+  status: Fixed
+  resolution: Reload employees setelah import sukses (Attendance.tsx)
   steps: ["Absensi sebagai manager", "Import CSV 1 baris valid", "Lihat dropdown pegawai"]
   actual: Nama baru tak muncul sampai reload manual
   expected: Dropdown reload otomatis setelah import sukses
@@ -9,7 +10,8 @@
 - id: BUG-SB-002
   title: Tab aktif tak persist setelah reload
   severity: Low
-  status: Open
+  status: Fixed
+  resolution: Persist tab di localStorage (App.tsx Shell)
   steps: ["Buka Absensi", "Reload browser"]
   actual: Kembali ke Jadwal
   expected: Tetap di tab Absensi (persist state/route)
