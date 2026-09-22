@@ -1,5 +1,9 @@
 # shiftbase-qa
 
+[![ci](https://github.com/RakhaYandra/shiftbase-qa/actions/workflows/ci.yml/badge.svg)](https://github.com/RakhaYandra/shiftbase-qa/actions)
+
+> Ekosistem: [api](https://github.com/RakhaYandra/shiftbase) · [web](https://github.com/RakhaYandra/shiftbase-web) · [docs](https://github.com/RakhaYandra/shiftbase-docs/releases) · [qa](https://github.com/RakhaYandra/shiftbase-qa) · [data](https://github.com/RakhaYandra/shiftbase-data) · [ops](https://github.com/RakhaYandra/shiftbase-ops)
+
 QA portfolio untuk Shiftbase — test plan, 38 test cases, 2 bug report
 (semua Fixed), Newman API suite, Playwright e2e 3 peran, laporan Excel.
 
